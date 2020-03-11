@@ -42,7 +42,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BarcodeEventArgs.cs" />
-    <Compile Include="IBarcodeScanner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimpleBarcodeScanner.cs" />
   </ItemGroup>

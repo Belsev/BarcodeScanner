@@ -1,14 +1,14 @@
 using System;
 
-namespace BarcodeScannerInterface
+namespace BarcodeScanner
 {
     public class BarcodeEventArgs : EventArgs
     {
-        public BarcodeEventArgs(string scanData)
+        public BarcodeEventArgs(string barcode)
         {
-            ScanData = scanData;
+            Barcode = barcode;
         }
 
-        public string ScanData { get; private set; }
+        public string Barcode { get; private set; }
     }
 }

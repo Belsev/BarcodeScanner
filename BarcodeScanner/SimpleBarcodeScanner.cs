@@ -4,7 +4,7 @@ using System.IO.Ports;
 using System.Linq;
 using System.Threading;
 
-namespace BarcodeScannerInterface
+namespace BarcodeScanner
 {
     public class SimpleBarcodeScanner : IDisposable
     {
@@ -39,7 +39,7 @@ namespace BarcodeScannerInterface
         }
 
         /// <summary>
-        /// ПДальнейшая обработка зачитанных в буфер данных
+        /// Дальнейшая обработка зачитанных в буфер данных
         /// </summary>
         private void BufferThreadWorker()
         {
@@ -68,6 +68,7 @@ namespace BarcodeScannerInterface
                     try
                     {
                         serialPort.Close();
+                        //Нужна пауза между закрытием и открытием
                         Thread.Sleep(500);
                         serialPort.Open();
                     }
