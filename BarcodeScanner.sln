@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.960
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BarcodeScanner", "BarcodeScanner\BarcodeScanner.csproj", "{81A71A4F-0ADC-4F4C-A707-2E357A54639E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{81A71A4F-0ADC-4F4C-A707-2E357A54639E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81A71A4F-0ADC-4F4C-A707-2E357A54639E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81A71A4F-0ADC-4F4C-A707-2E357A54639E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81A71A4F-0ADC-4F4C-A707-2E357A54639E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {851EBA8A-5DA8-4E77-B38C-076F5DFCF021}
+	EndGlobalSection
+EndGlobal
