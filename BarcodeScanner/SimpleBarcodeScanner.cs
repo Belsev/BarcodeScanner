@@ -8,42 +8,60 @@ namespace BarcodeScanner
 {
     public class SimpleBarcodeScanner : IDisposable
     {
+        /// <summary>
+        /// SerialPort Object
+        /// </summary>
         private readonly SerialPort serialPort;
+        /// <summary>
+        /// COM Port number
+        /// </summary>
         private readonly int port;
-        private bool keepAlive = true;
+        /// <summary>
+        /// Flag, signaling to stop all threads
+        /// </summary>
+        private bool disposedFlag = false;
+        /// <summary>
+        /// A Buffer containing every read data from the COM port
+        /// </summary>
         private List<string> buffer = new List<string>();
 
         /// <summary>
-        /// Событие с одним штрих-кодом
+        /// Array of symbols, separating barcodes from each other.
+        /// By default \r and \n
+        /// </summary>
+        public char[] Separators { get; set; } = { '\r', '\n' };
+
+        /// <summary>
+        /// Async event containing one Barcode. Invokes after barcode being read
         /// </summary>
         public event EventHandler<BarcodeEventArgs> BarcodeEvent;
 
         /// <summary>
-        /// Создаёт новый экземпляр Сканера и сразу занимает порт
+        /// Creates new SimpleBarcodeScanner object and instantly occupies COM port
         /// </summary>
-        /// <param name="port">COM порт</param>
+        /// <param name="port">COM port</param>
         public SimpleBarcodeScanner(int port)
         {
             this.port = port;
             serialPort = new SerialPort($"COM{port}");
             serialPort.Open();
 
-            var portListenThread = new Thread(PortListenThreadWorker);
+            var portListenThread = new Thread(PortListenWorker);
             portListenThread.Start();
 
-            var healthRestoreThread = new Thread(HealthRestoreThreadWorker);
+            var healthRestoreThread = new Thread(HealthRestoreWorker);
             healthRestoreThread.Start();
 
-            var bufferThread = new Thread(BufferThreadWorker);
+            var bufferThread = new Thread(ReadBufferWorker);
             bufferThread.Start();
         }
 
         /// <summary>
-        /// Дальнейшая обработка зачитанных в буфер данных
+        /// Retrieving data from a buffer and then flushing it
         /// </summary>
-        private void BufferThreadWorker()
+        private void ReadBufferWorker()
         {
-            while (keepAlive)
+            while (!disposedFlag)
             {
                 var newList = new List<string>();
                 lock (buffer)
@@ -51,24 +69,24 @@ namespace BarcodeScanner
                     newList = buffer.ToList();
                     buffer.Clear();
                 }
-                ReadData(newList);
+                ProcessData(newList);
                 Thread.Sleep(100);
             }
         }
 
         /// <summary>
-        /// Переподключение сканера при его отключении
+        /// Attempting to reconnect Barcode scanner in case of sudden disconnects
         /// </summary>
-        private void HealthRestoreThreadWorker()
+        private void HealthRestoreWorker()
         {
-            while (keepAlive)
+            while (!disposedFlag)
             {
                 if (!serialPort.IsOpen)
                 {
                     try
                     {
                         serialPort.Close();
-                        //Нужна пауза между закрытием и открытием
+                        //Referring to documentations need to pause
                         Thread.Sleep(500);
                         serialPort.Open();
                     }
@@ -79,11 +97,11 @@ namespace BarcodeScanner
         }
 
         /// <summary>
-        /// Прослушивание порта
+        /// Listening to COM port
         /// </summary>
-        private void PortListenThreadWorker()
+        private void PortListenWorker()
         {
-            while (keepAlive)
+            while (!disposedFlag)
             {
                 var data = serialPort.ReadExisting();
                 if (!string.IsNullOrWhiteSpace(data))
@@ -98,15 +116,14 @@ namespace BarcodeScanner
         }
 
         /// <summary>
-        /// Разделение считанных данных на штрихкоды и дальнейшая их отправка
+        /// Separating data from buffer into barcodes. Invokes BarcodeEvent for every barcode
         /// </summary>
-        /// <param name="readedData">Считанные данные</param>
-        private void ReadData(List<string> readedData)
+        /// <param name="dataToProcess">Data to process</param>
+        private void ProcessData(List<string> dataToProcess)
         {
-            readedData.ForEach(data =>
+            dataToProcess.ForEach(data =>
             {
-                char[] separators = { '\r', '\n' };
-                var barcodes = data.Split(separators, StringSplitOptions.RemoveEmptyEntries).ToList();
+                var barcodes = data.Split(Separators, StringSplitOptions.RemoveEmptyEntries).ToList();
 
                 barcodes.ForEach(barcode =>
                 {
@@ -117,9 +134,9 @@ namespace BarcodeScanner
         }
 
         /// <summary>
-        /// Состояние сканера
+        /// Scanner state
         /// </summary>
-        public bool Alive
+        public bool Connected
         {
             get
             {
@@ -129,7 +146,7 @@ namespace BarcodeScanner
 
         public void Dispose()
         {
-            keepAlive = false;
+            disposedFlag = true;
             serialPort?.Dispose();
         }
 
