@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace BarcodeScanner
 {
-    public class SimpleBarcodeScanner : IDisposable
+    public class AutoBarcodeScanner : IDisposable
     {
         /// <summary>
         /// SerialPort Object
@@ -37,10 +37,10 @@ namespace BarcodeScanner
         public event EventHandler<BarcodeEventArgs> BarcodeEvent;
 
         /// <summary>
-        /// Creates new SimpleBarcodeScanner object and instantly occupies COM port
+        /// Creates new AutoBarcodeScanner object and instantly occupies COM port
         /// </summary>
         /// <param name="port">COM port</param>
-        public SimpleBarcodeScanner(int port)
+        public AutoBarcodeScanner(int port)
         {
             this.port = port;
             serialPort = new SerialPort($"COM{port}");
@@ -150,7 +150,7 @@ namespace BarcodeScanner
             serialPort?.Dispose();
         }
 
-        ~SimpleBarcodeScanner()
+        ~AutoBarcodeScanner()
         {
             Dispose();
         }
